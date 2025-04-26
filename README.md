@@ -1,4 +1,4 @@
-## Pull Upload via Vimeo API
+## Understanding video pull uploads by referencing an external URL
 
 [![DOI](https://zenodo.org/badge/973096294.svg)](https://doi.org/10.5281/zenodo.15286574)
 
