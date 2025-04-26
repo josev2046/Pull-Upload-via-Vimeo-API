@@ -1,0 +1,36 @@
+@startuml
+participant "Client (curl)" as Client
+participant "Vimeo API\n(api.vimeo.com)" as VimeoAPI
+
+note over Client: Initiates video upload via API
+
+Client -> VimeoAPI: POST /me/videos
+note right of VimeoAPI: HTTP POST Request\nHeaders:\nAuthorization: Bearer {TOKEN}\nContent-Type: application/json\nAccept: application/vnd.vimeo.*+json;version=3.4\nBody:\n{\n  "upload": {\n    "approach": "pull",\n    "link": "{URL}"\n  },\n  "name": "{name}"\n}
+activate VimeoAPI
+
+note over VimeoAPI: Authenticates the request\nusing the Bearer token
+
+VimeoAPI -> VimeoAPI: Verify Authorization
+note right of VimeoAPI: Checks if the provided\n{TOKEN} is valid
+
+alt Authorization successful
+  VimeoAPI -> VimeoAPI: Process Upload Data
+  note right of VimeoAPI: Extracts upload approach,\nlink, and video name
+
+  VimeoAPI -> VimeoAPI: Initiate Video Pull
+  note right of VimeoAPI: Starts downloading the video\nfrom the provided {URL}
+
+  VimeoAPI -> VimeoAPI: Create Video Record
+  note right of VimeoAPI: Creates a new video entry\nwith the given {name}
+
+  VimeoAPI -> Client: HTTP/1.1 2xx OK (or other success code)\nHeaders: ...\nBody: ... (details of the new video)
+  note left of VimeoAPI: Sends a success response\nwith video information
+else Authorization failed
+  VimeoAPI -> Client: HTTP/1.1 4xx Unauthorized (or other error code)\nHeaders: ...\nBody: ... (error details)
+  note left of VimeoAPI: Sends an error response\nindicating authentication failure
+end
+
+deactivate VimeoAPI
+deactivate Client
+
+@enduml
